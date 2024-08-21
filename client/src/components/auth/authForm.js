@@ -1,0 +1,162 @@
+// src/components/AuthForm.js
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import styled, { keyframes } from 'styled-components';
+import { useAuth } from '../../context/authContext';
+
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const FormContainer = styled.div`
+  width: 300px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  animation: ${slideIn} 0.5s ease-out;
+`;
+
+const FormTitle = styled.h2`
+  margin-bottom: 20px;
+  text-align: center;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 10px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: #218838;
+  }
+`;
+
+const ToggleLink = styled.p`
+  margin-top: 10px;
+  text-align: center;
+  color: #007bff;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const AuthForm = () => {
+  const [isSignup, setIsSignup] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('user'); // Default role
+  const { isAuthenticated, isAdmin, login } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect authenticated users away from the auth form
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(isAdmin ? '/Adashboard' : '/'); // Redirect to admin or home page
+    }
+  }, [isAuthenticated, isAdmin, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const url = isSignup ? 'http://localhost:5000/api/auth/signup' : 'http://localhost:5000/api/auth/login';
+      const data = isSignup ? { username, email, password, role } : { email, password };
+
+      // console.log('Sending request to:', url);
+      // console.log('Request data:', data);
+
+      const response = await axios.post(url, data);
+      // console.log('Response:', response);
+
+      if (isSignup && response.data.isAuthenticated) {
+        alert('Signup successful');
+        navigate('/dashboard'); // Redirect to login page after signup
+      } else {
+        if (response.data.isAuthenticated) {
+          await login(email, password); // Update auth context
+          navigate(isAdmin ? '/Adashboard' : '/dashboard');  // Navigate based on role
+        } else {
+          navigate('/authForm')
+          alert('Login failed'); // Notify user if login fails
+        }
+      }
+    } catch (error) {
+      console.error(`${isSignup ? 'Signup' : 'Login'} failed:`, error.response ? error.response.data : error.message);
+      alert(`${isSignup ? 'Signup' : 'Login'} failed: ${error.response ? error.response.data.message : error.message}`);
+    }
+  };
+
+  return (
+    <FormContainer>
+      <FormTitle>{isSignup ? 'Sign Up' : 'Login'}</FormTitle>
+      <form onSubmit={handleSubmit}>
+        {isSignup && (
+          <>
+            <Input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <Select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </Select>
+          </>
+        )}
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button type="submit">{isSignup ? 'Sign Up' : 'Login'}</Button>
+        <ToggleLink onClick={() => setIsSignup(!isSignup)}>
+          {isSignup ? 'Already have an account? Login' : 'Don\'t have an account? Sign Up'}
+        </ToggleLink>
+        <Link className="btn  mt-5 btn-outline-primary btn-sm" to={'/dashboard'}> Guest</Link>
+      </form>
+    </FormContainer>
+  );
+};
+
+export default AuthForm;

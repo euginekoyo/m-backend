@@ -1,7 +1,7 @@
 // Dashboard.js
 import React from 'react';
 import styled from 'styled-components';
-
+import couresel from '../Layout/couresel';
 const DashboardWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -63,6 +63,7 @@ const ADashboard = () => {
           {/* Add content or components for analytics */}
         </Widget>
       </WidgetsContainer>
+      <couresel />
     </DashboardWrapper>
   );
 };

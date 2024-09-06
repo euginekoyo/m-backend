@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Skeleton from './Layout/Skeleton';
 import styled from 'styled-components';
+import { fetchMovies } from '../../api'; // Adjust the path as needed
 
 const Card = styled.div`
   background: white;
@@ -48,9 +49,9 @@ function MovieDetails() {
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/movies/${id}`);
-        const data = await response.json();
-        setMovie(data);
+        const movies = await fetchMovies();
+        const movie = movies.find(movie => movie.id === id); // Adjust based on your data structure
+        setMovie(movie);
       } catch (error) {
         console.error('Error fetching movie:', error);
       } finally {

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { fetchMovies } from '../../api';
 import Movie from './movie';
-import { Link } from 'react-router-dom';
 import Skeleton from './Layout/Skeleton';
 
 const MovieListContainer = styled.div`
@@ -10,40 +9,46 @@ const MovieListContainer = styled.div`
   min-height: 100vh;
   color: white;
   padding: 20px;
+  position: relative;
+
+  ${({ isBlurred }) =>
+    isBlurred &&
+    `
+    filter: blur(5px);
+    pointer-events: none;
+  `}
 `;
 
-const Header = styled.div`
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-
-  h1 {
-    margin: 0;
-  }
-
-  .admin-link {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    transition: background-color 0.3s;
-
-    &:hover {
-      background-color: #0056b3;
-    }
-  }
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10;
 `;
 
 const MovieGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); // Adjust column size for mobile
   gap: 20px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); // Smaller columns for tablets and phones
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); // Even smaller for small mobile screens
+  }
 `;
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
+  const [selectedMovieId, setSelectedMovieId] = useState(null);
 
   useEffect(() => {
     const getMovies = async () => {
@@ -53,19 +58,43 @@ const MovieList = () => {
 
     getMovies();
   }, []);
-  if (!movies.length) return <Skeleton />;
-  return (
-    <MovieListContainer>
-      <Header>
-        {/* <h1>Movies</h1> */}
 
-      </Header>
-      <MovieGrid>
-        {movies.map((movie) => (
-          <Movie key={movie._id} movie={movie} />
-        ))}
-      </MovieGrid>
-    </MovieListContainer>
+  const handleMovieSelect = (movieId) => {
+    setSelectedMovieId(movieId);
+  };
+
+  const handleCloseOverlay = () => {
+    setSelectedMovieId(null);
+  };
+
+  const selectedMovie = movies.find((movie) => movie._id === selectedMovieId);
+
+  if (!movies.length) return <Skeleton />;
+
+  return (
+    <>
+      <MovieListContainer isBlurred={!!selectedMovieId}>
+        <MovieGrid>
+          {movies.map((movie) => (
+            <Movie
+              key={movie._id}
+              movie={movie}
+              onSelect={() => handleMovieSelect(movie._id)}
+            />
+          ))}
+        </MovieGrid>
+      </MovieListContainer>
+
+      {selectedMovie && (
+        <Overlay>
+          <Movie
+            movie={selectedMovie}
+            isSelected={true}
+            onDismiss={handleCloseOverlay} // Pass the dismiss function
+          />
+        </Overlay>
+      )}
+    </>
   );
 };
 

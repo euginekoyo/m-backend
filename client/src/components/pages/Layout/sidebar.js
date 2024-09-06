@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaBars, FaHome, FaFilm, FaUser, FaUserShield, FaSignOutAlt, FaSign, FaSignInAlt } from 'react-icons/fa';
+import { RiAdminFill } from "react-icons/ri";
+import { FaBars, FaHome, FaFilm, FaSignOutAlt, FaSignInAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/authContext'; // Ensure this is the correct path
+import { motion } from 'framer-motion';
 
-const SidebarWrapper = styled.div`
+const SidebarWrapper = styled(motion.div)`
   width: ${({ isVisible }) => (isVisible ? '100px' : '50px')};
   height: 100vh;
   background: ${({ isVisible }) => isVisible ?
@@ -24,7 +26,7 @@ const ToggleButton = styled.div`
   font-size: 1.5rem;
   color: white;
   cursor: pointer;
-  position: fixed;
+  position: sticky;
   top: 10px;
   left: 8px;
   z-index: 10;
@@ -93,9 +95,12 @@ const Sidebar = ({ isVisible, toggleSidebar }) => {
       <ToggleButton onClick={toggleSidebar}>
         <FaBars />
       </ToggleButton>
-      <SidebarWrapper isVisible={isVisible}>
-
-
+      <SidebarWrapper
+        isVisible={isVisible}
+        initial={{ width: '50px', transform: 'translateX(-100%)' }}
+        animate={{ width: isVisible ? '100px' : '50px', transform: isVisible ? 'translateX(0)' : 'translateX(0)' }}
+        transition={{ duration: 0.3 }}
+      >
         {isAuthenticated && (
           <>
             <SidebarItem to="/dashboard" isVisible={isVisible}>
@@ -106,14 +111,11 @@ const Sidebar = ({ isVisible, toggleSidebar }) => {
               <FaFilm />
               {isVisible && <span>Movies</span>}
             </SidebarItem>
-            <SidebarItem to="/profile" isVisible={isVisible}>
-              <FaUser />
-              {isVisible && <span>Profile</span>}
-            </SidebarItem>
-            {isAdmin && (
+            
+            {isAdmin && isAuthenticated && (
               <>
                 <SidebarItem to="/admin" isVisible={isVisible}>
-                  <FaUserShield />
+                  <RiAdminFill />
                   {isVisible && <span>Admin</span>}
                 </SidebarItem>
               </>
@@ -127,7 +129,7 @@ const Sidebar = ({ isVisible, toggleSidebar }) => {
         {!isAuthenticated && !isAdmin && (
           <>
             <SidebarItem to="/dashboard" isVisible={isVisible}>
-              <FaHome />
+              <FaFilm />
               {isVisible && <span>Home</span>}
             </SidebarItem>
             <SidebarItem to="/authForm" isVisible={isVisible}>

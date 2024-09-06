@@ -1,102 +1,136 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, animateScroll as scroll } from 'react-scroll';
 
 const Card = styled.div`
-  background: linear-gradient(
-      to bottom,
-      rgba(20, 20, 20, 0.7),
-      rgba(20, 20, 20, 0.9)
-    ),
-    #141414;
+  background: ${({ isSelected }) =>
+    isSelected
+      ? 'linear-gradient(to bottom, rgba(255, 0, 0, 0.7), rgba(255, 0, 0, 0.9))'
+      : 'linear-gradient(to bottom, rgba(20, 20, 20, 0.7), rgba(20, 20, 20, 0.9))'};
   color: white;
-  border: none;
   border-radius: 20px;
   transition: transform 0.3s, box-shadow 0.3s;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-
+  cursor: ${({ isSelected }) => (isSelected ? 'default' : 'pointer')};
+  box-shadow: ${({ isSelected }) =>
+    isSelected ? '0 8px 16px rgba(255, 0, 0, 0.5)' : '0 4px 8px rgba(0, 0, 0, 0.3)'};
+  
   &:hover {
-    transform: scale(1.05);
+    transform: ${({ isSelected }) => (isSelected ? 'none' : 'scale(1.03)')};
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
   }
 
+  ${({ isSelected }) =>
+    isSelected &&
+    `
+    width: 70%;
+    height: 60%;
+    position: relative;
+    z-index: 1000;
+    padding: 40px;
+  `}
   @media (max-width: 768px) {
-    flex-direction: column;
-    margin: 10px;
+    width: ${({ isSelected }) => (isSelected ? '50%' : '100%')} ;
+    height: ${({ isSelected }) => (isSelected ? 'auto' : '200px')}; // Smaller images on tablets
   }
 `;
 
 const PosterImage = styled.img`
-  width: 100%;
-  height: 300px;
+  width: ${({ isSelected }) => (isSelected ? '70%' : '100%')} ;
+  height: ${({ isSelected }) => (isSelected ? '60%' : '300px')}; // Automatically adjust height on selection
   object-fit: cover;
+  border-radius: 20px;
 
   @media (max-width: 768px) {
-    height: 200px;
+    width: ${({ isSelected }) => (isSelected ? '70%' : '100%')} ;
+    height: ${({ isSelected }) => (isSelected ? 'auto' : '200px')}; // Smaller images on tablets
+  }
+
+  @media (max-width: 480px) {
+    height: ${({ isSelected }) => (isSelected ? 'auto' : '150px')}; // Even smaller images on mobile
   }
 `;
 
 const CardBody = styled.div`
   padding: 20px;
-  background: linear-gradient(
-      to top,
-      rgba(20, 20, 20, 0.9),
-      rgba(20, 20, 20, 0.7)
-    ),
-    transparent;
 `;
-
 const CardTitle = styled.h5`
   font-size: 1.25rem;
-  font-weight: bold;
+
+  @media (max-width: 768px) {
+    font-size: 1rem; // Reduce font size for tablets
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.875rem; // Reduce font size for mobile
+  }
 `;
 
 const CardText = styled.p`
   font-size: 0.9rem;
-  margin-bottom: 10px;
-`;
 
-const Video = styled.video`
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 4px;
-`;
+  @media (max-width: 768px) {
+    font-size: 0.75rem; // Reduce font size for smaller screens
+  }
 
-const StyledLink = styled(Link)`
-  display: inline-block;
-  margin-top: 10px;
-  padding: 10px 20px;
-  background-color: #e50914;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: #f40612;
+  @media (max-width: 480px) {
+    font-size: 0.7rem; // Further reduction for mobile
   }
 `;
 
-const Movie = ({ movie }) => {
-  return (
-    <Card>
-      {movie.posterUrl && (
-        <PosterImage src={`${movie.posterUrl}`} alt={`${movie.title} poster`} />
-      )}
+const StyledLink = styled(Link)`
+  padding: 10px 20px;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 4px;
 
+  @media (max-width: 768px) {
+    padding: 8px 16px; // Reduce padding for smaller screens
+  }
+
+  @media (max-width: 480px) {
+    padding: 6px 12px; // Further reduction for mobile
+  }
+
+  &:hover {
+    background-color: black;
+    color: white;
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #e50914;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+`;
+
+const Movie = ({ movie, isSelected, onSelect, onDismiss }) => {
+  const handleScrollToTop = () => {
+    scroll.scrollToTop();
+  };
+
+  return (
+    <Card onClick={!isSelected ? onSelect : null} isSelected={isSelected}>
+      {isSelected && <CloseButton onClick={onDismiss}>✖</CloseButton>}
+      {movie.posterUrl && (
+        <PosterImage src={`${movie.posterUrl}`} alt={`${movie.title} poster`} isSelected={isSelected} />
+      )}
       <CardBody>
         <CardTitle>{movie.title}</CardTitle>
         <CardText>{movie.description}</CardText>
-        <CardText><strong>Release Date:</strong> {new Date(movie.releaseDate).toLocaleDateString()}</CardText>
-
-        <StyledLink to={`/movie/${movie._id}`}>Download</StyledLink>
+        <StyledLink to={`/movie/${movie._id}`} onClick={handleScrollToTop}>
+          Download
+        </StyledLink>
       </CardBody>
     </Card>
   );
@@ -107,10 +141,11 @@ Movie.propTypes = {
     _id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
-    releaseDate: PropTypes.string,
     posterUrl: PropTypes.string,
-    videoUrl: PropTypes.string,
   }).isRequired,
+  isSelected: PropTypes.bool,
+  onSelect: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func.isRequired,
 };
 
 export default Movie;

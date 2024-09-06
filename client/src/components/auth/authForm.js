@@ -18,11 +18,13 @@ const slideIn = keyframes`
 
 const FormContainer = styled.div`
   width: 300px;
-  margin: 0 auto;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:80px;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 10px;
-  background: #fff;
+  background: #222;
   animation: ${slideIn} 0.5s ease-out;
 `;
 
@@ -133,7 +135,7 @@ const AuthForm = () => {
             />
             <Select value={role} onChange={(e) => setRole(e.target.value)}>
               <option value="user">User</option>
-              <option value="admin">Admin</option>
+              {/* <option value="admin">Admin</option> */}
             </Select>
           </>
         )}

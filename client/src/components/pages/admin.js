@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { createMovie } from '../../../api';
+import { createMovie } from '../../api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router';
 
@@ -10,6 +10,7 @@ const AdminContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left:1px;
 `;
 
 const FormWrapper = styled.div`

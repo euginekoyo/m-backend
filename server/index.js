@@ -38,7 +38,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
         store: MongoStore.create({
-            mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/mflix', // Ensure correct mongoUrl
+            mongoUrl: process.env.MONGO_URI || 'mongodb+srv://euginekoyo141:WZHtVTFRwxgd57JQ@cluster0.jbv3i.mongodb.net/', // Ensure correct mongoUrl
         }),
         cookie: {
             maxAge: 1000 * 60 * 60 * 24, // 1 day

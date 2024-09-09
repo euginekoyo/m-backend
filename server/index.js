@@ -25,7 +25,7 @@ connectDB();
 // Middleware
 app.use(helmet());
 const corsOptions = {
-    origin: 'https://mflix-1.onrender.com', 
+    origin: 'https://mflix-2.onrender.com', 
     //origin: 'http://localhost:3000', // Replace with your frontend origin
     credentials: true, // Allow credentials (cookies) to be sent
 };

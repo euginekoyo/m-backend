@@ -24,7 +24,7 @@ const FormContainer = styled.div`
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 10px;
-  background: #222;
+  background: #282;
   animation: ${slideIn} 0.5s ease-out;
 `;
 

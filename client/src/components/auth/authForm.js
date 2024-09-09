@@ -104,8 +104,12 @@ const AuthForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = isSignup ? 'http://localhost:5000/api/auth/signup' : 'http://localhost:5000/api/auth/login';
-      const data = isSignup ? { username, email, password, role } : { email, password };
+      const url = isSignup 
+        ? `${process.env.REACT_APP_API_BASE_URL}/api/auth/signup` 
+        : `${process.env.REACT_APP_API_BASE_URL}/api/auth/login`;
+      const data = isSignup 
+        ? { username, email, password, role } 
+        : { email, password };
   
       const response = await axios.post(url, data);
   
@@ -128,6 +132,7 @@ const AuthForm = () => {
       alert(`${isSignup ? 'Signup' : 'Login'} failed: ${error.response ? error.response.data.message : error.message}`);
     }
   };
+  
   
 
   return (

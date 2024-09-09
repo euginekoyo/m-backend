@@ -32,6 +32,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Session management
+
 app.use(
     session({
         secret: process.env.SESSION_SECRET || 'default-secret',

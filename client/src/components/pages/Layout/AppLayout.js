@@ -1,11 +1,9 @@
-// src/components/pages/Layout/AppLayout.js
 import React, { useState } from "react";
 import styled from "styled-components";
 import Sidebar from "./sidebar";
 import Topbar from "./Topbar";
 import { Route, Routes } from "react-router-dom";
 import MovieList from "../movieList";
-//import ADashboard from '../../pages/admin/Adashboard';
 import Dashboard from "../admin/Adashboard"; // Import Dashboard if needed
 import LandingPage from "../landingPage";
 import MovieDetails from "../MDetails";
@@ -23,7 +21,7 @@ const MainContent = styled.div`
     isSidebarVisible ? "100px" : "50px"};
   margin-right: 0; /* Add right margin */
   padding-top: 20px; /* Same height as Topbar */
-  padding-bottom: 0 /* Optional: Add some padding at the bottom */
+  padding-bottom: 0; /* Optional: Add some padding at the bottom */
   transition: margin-left 0.3s ease;
   filter: ${({ isSidebarVisible }) =>
     isSidebarVisible ? "blur(3px)" : "none"};
@@ -40,7 +38,7 @@ const AppLayout = () => {
     <>
       <Sidebar isVisible={sidebarVisible} toggleSidebar={toggleSidebar} />
       <PageWrapper isSidebarVisible={sidebarVisible}>
-        <Topbar />
+        <Topbar toggleSidebar={toggleSidebar} />
         <MainContent isSidebarVisible={sidebarVisible}>
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />

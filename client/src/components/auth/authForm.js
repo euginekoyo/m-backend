@@ -86,32 +86,40 @@ const AuthForm = () => {
 
   // Redirect authenticated users away from the auth form
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(isAdmin ? '/Adashboard' : '/'); // Redirect to admin or home page
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        // Update state or context with user data
+         setUsername(user.username); 
+         setEmail(user.email);
+      } catch (error) {
+        console.error('Failed to parse user data:', error);
+        localStorage.removeItem('user'); // Clear invalid data
+      }
     }
   }, [isAuthenticated, isAdmin, navigate]);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const url = isSignup ? 'http://localhost:5000/api/auth/signup' : 'http://localhost:5000/api/auth/login';
       const data = isSignup ? { username, email, password, role } : { email, password };
-
-      // console.log('Sending request to:', url);
-      // console.log('Request data:', data);
-
+  
       const response = await axios.post(url, data);
-      // console.log('Response:', response);
-
+  
       if (isSignup && response.data.isAuthenticated) {
         alert('Signup successful');
+        localStorage.setItem('user', JSON.stringify(response.data.user)); // Store user data
         navigate('/dashboard'); // Redirect to login page after signup
       } else {
         if (response.data.isAuthenticated) {
+          localStorage.setItem('user', JSON.stringify(response.data.user)); // Store user data
           await login(email, password); // Update auth context
-          navigate(isAdmin ? '/Adashboard' : '/dashboard');  // Navigate based on role
+          navigate(isAdmin ? '/Adashboard' : '/dashboard'); // Navigate based on role
         } else {
-          navigate('/authForm')
+          navigate('/authForm');
           alert('Login failed'); // Notify user if login fails
         }
       }
@@ -120,6 +128,7 @@ const AuthForm = () => {
       alert(`${isSignup ? 'Signup' : 'Login'} failed: ${error.response ? error.response.data.message : error.message}`);
     }
   };
+  
 
   return (
     <FormContainer>

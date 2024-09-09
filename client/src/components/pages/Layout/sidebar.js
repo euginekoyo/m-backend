@@ -4,9 +4,8 @@ import { RiAdminFill } from "react-icons/ri";
 import { FaBars, FaHome, FaFilm, FaSignOutAlt, FaSignInAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/authContext'; // Ensure this is the correct path
-import { motion } from 'framer-motion';
 
-const SidebarWrapper = styled(motion.div)`
+const SidebarWrapper = styled.div`
   width: ${({ isVisible }) => (isVisible ? '100px' : '50px')};
   height: 100vh;
   background: ${({ isVisible }) => isVisible ?
@@ -26,10 +25,10 @@ const ToggleButton = styled.div`
   font-size: 1.5rem;
   color: white;
   cursor: pointer;
-  position: sticky;
-  top: 10px;
-  left: 8px;
-  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000; /* Ensure it is higher than the Sidebar's z-index */
 `;
 
 const SidebarItem = styled(Link)`
@@ -43,16 +42,16 @@ const SidebarItem = styled(Link)`
   transition: background-color 0.3s ease, padding-left 0.3s ease;
 
   svg {
-    font-size: 1.5rem; /* Icon size */
-    margin-right: ${({ isVisible }) => (isVisible ? '10px' : '0')}; /* Space for text */
+    font-size: 1.5rem;
+    margin-right: ${({ isVisible }) => (isVisible ? '10px' : '0')};
   }
 
   span {
-    display: ${({ isVisible }) => (isVisible ? 'inline' : 'none')}; /* Show text only if sidebar is visible */
+    display: ${({ isVisible }) => (isVisible ? 'inline' : 'none')};
   }
 
   &:hover {
-    background-color: #333; /* Background on hover */
+    background-color: #333;
   }
 `;
 
@@ -68,16 +67,16 @@ const LogoutButton = styled.button`
   transition: background-color 0.3s ease;
 
   svg {
-    font-size: 1.5rem; /* Icon size */
-    margin-right: ${({ isVisible }) => (isVisible ? '10px' : '0')}; /* Space for text */
+    font-size: 1.5rem;
+    margin-right: ${({ isVisible }) => (isVisible ? '10px' : '0')};
   }
 
   span {
-    display: ${({ isVisible }) => (isVisible ? 'inline' : 'none')}; /* Show text only if sidebar is visible */
+    display: ${({ isVisible }) => (isVisible ? 'inline' : 'none')};
   }
 
   &:hover {
-    background-color: #333; /* Background on hover */
+    background-color: #333;
   }
 `;
 
@@ -92,15 +91,7 @@ const Sidebar = ({ isVisible, toggleSidebar }) => {
 
   return (
     <>
-      <ToggleButton onClick={toggleSidebar}>
-        <FaBars />
-      </ToggleButton>
-      <SidebarWrapper
-        isVisible={isVisible}
-        initial={{ width: '50px', transform: 'translateX(-100%)' }}
-        animate={{ width: isVisible ? '100px' : '50px', transform: isVisible ? 'translateX(0)' : 'translateX(0)' }}
-        transition={{ duration: 0.3 }}
-      >
+      <SidebarWrapper isVisible={isVisible}>
         {isAuthenticated && (
           <>
             <SidebarItem to="/dashboard" isVisible={isVisible}>
@@ -113,12 +104,10 @@ const Sidebar = ({ isVisible, toggleSidebar }) => {
             </SidebarItem>
             
             {isAdmin && isAuthenticated && (
-              <>
-                <SidebarItem to="/admin" isVisible={isVisible}>
-                  <RiAdminFill />
-                  {isVisible && <span>Admin</span>}
-                </SidebarItem>
-              </>
+              <SidebarItem to="/admin" isVisible={isVisible}>
+                <RiAdminFill />
+                {isVisible && <span>Admin</span>}
+              </SidebarItem>
             )}
             <LogoutButton onClick={handleLogout} isVisible={isVisible}>
               <FaSignOutAlt />
@@ -129,7 +118,7 @@ const Sidebar = ({ isVisible, toggleSidebar }) => {
         {!isAuthenticated && !isAdmin && (
           <>
             <SidebarItem to="/dashboard" isVisible={isVisible}>
-              <FaFilm />
+              <FaFilm/>
               {isVisible && <span>Home</span>}
             </SidebarItem>
             <SidebarItem to="/authForm" isVisible={isVisible}>

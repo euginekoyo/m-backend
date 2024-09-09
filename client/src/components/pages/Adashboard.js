@@ -16,9 +16,11 @@ const DashboardWrapper = styled.div`
 const Header = styled.header`
   background: #223;
   padding: 15px;
+  margin-top: 100px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   margin-bottom: 20px;
+  text-align: center;
 `;
 
 const WidgetsContainer = styled.div`
@@ -41,16 +43,48 @@ const Title = styled.h2`
   font-size: 1.5rem;
 `;
 
+const MoviesContainer = styled.div`
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+`;
+
+const MovieCard = styled.div`
+  background: #3a3a3a;
+  border-radius: 8px;
+  padding: 10px;
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+`;
+
+const PosterImage = styled.img`
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+`;
+
 const Dashboard = () => {
-  const [movies, setMovies] = useState('');
-  useEffect((req, res) => {
-    const fetchMovies = async () => {
-      const fetchedMovies = await fetchMovies();
-      setMovies(fetchedMovies);
-      console.log(movies)
+  const [movies, setMovies] = useState([]);
+
+  useEffect(() => {
+    const fetchMoviesData = async () => {
+      try {
+        const fetchedMovies = await fetchMovies();
+        setMovies(fetchedMovies);
+      } catch (error) {
+        console.error('Error fetching movies:', error);
+      }
     };
-    fetchMovies();
-  }, [])
+    fetchMoviesData();
+  }, []);
+
   return (
     <DashboardWrapper>
       <Header>
@@ -74,14 +108,16 @@ const Dashboard = () => {
           {/* Add content or components for analytics */}
         </Widget>
       </WidgetsContainer>
-      {movies.localeCompare((movie) => (
-        <div key={movie._id} movie={movie}>
-          {movie.title}
-          {movie.posterUrl && (
-            <PosterImage src={`${movie.posterUrl}`} alt={`${movie.title} poster`} />
-          )}
-        </div>
-      ))}
+      <MoviesContainer>
+        {movies.map((movie) => (
+          <MovieCard key={movie._id}>
+            {movie.posterUrl && (
+              <PosterImage src={`${movie.posterUrl}`} alt={`${movie.title} poster`} />
+            )}
+            <div>{movie.title}</div>
+          </MovieCard>
+        ))}
+      </MoviesContainer>
     </DashboardWrapper>
   );
 };
